@@ -1,0 +1,29 @@
+<dialog id="demande" >
+	<h1>Faire une Demande</h1>
+	<a class="close" onclick="dialog.close()">X</a>
+	<haiku-form>
+		<fieldset>
+			<h2>Raison</h2>
+			<div class="input-group">
+				<label>Project : </label>
+				<select>
+					<option></option>
+				</select>
+			</div>
+			<div class="input-group">
+				<label>Expliquer votre demande et sa raison : </label>
+				<textarea></textarea>
+			</div>
+			
+			<input type="button" class="next action-button" value="Next" name="next"/>
+		</fieldset>
+		<fieldset>
+			<h2>Demande</h2>
+			<div class="input-group">
+				<label>Montant : </label>
+				<input type="number" />
+			</div>
+			<input type="button" class="next action-button" value="Next" name="next"/>
+		</fieldset>
+	</haiku-form>
+</dialog>

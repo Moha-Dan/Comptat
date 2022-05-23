@@ -1,0 +1,19 @@
+<dialog id="login">
+		<h1>Account Login</h1>
+		<div >
+			<input type="text" name="username">
+			<label >Username</label>
+		</div>
+		<div class="">
+			<input type="password" name="password">
+			<label>Password</label>
+		</div>
+		<button onclick='session.set("service","connect"),session.set("username","PDG"),session.set("password","PDG"),session.save();location.hash = "";Haiku.update();this.parentElement.close()' >
+			Sign in
+		</button>
+		<div>
+			<a href="https://www.famobuty.fr/espace_membre/recovery" class="txt1">
+				Mot de passe oublier ?
+			</a>
+		</div>
+</dialog>

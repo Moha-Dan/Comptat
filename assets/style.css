@@ -1,0 +1,218 @@
+:root{
+	--dark:#000;
+	--dark-color:#46d;
+	--light:#eee;
+	--light-color:#eee;
+}
+.night{
+	--dark:#fff;
+	--dark-color:#4d6;
+	--light:#000;
+	--light-color:#223;
+}
+body{
+	--color:var(--dark-color);
+	margin: auto;
+	background-color: var(--light);
+	font-family: "Yu Gothic";
+	color: var(--dark);
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column
+}
+nav{
+	background-color: var(--light-color);
+	display:flex;
+	padding: 1.5rem 2.75rem;
+	padding-left: 20%;
+	box-shadow: 0px -10px 25px var(--dark-color);
+}
+nav>*{
+	margin: auto;
+}
+main{
+	margin: 0;
+	margin-bottom:auto;
+	padding: 1.5rem 2.75rem;
+	overflow-y: auto;
+}
+footer{
+	background: var(--light-color);
+	padding: 1.5rem 2.75rem;
+}
+.grid{
+	display: grid;
+	margin: auto;
+	width: min-content;
+	gap: 2rem;
+}
+.card{
+	background-color: var(--light-color);
+	border: solid var(--light) 1px;
+	border-radius:2rem;
+	padding: 1.5rem 2.75rem;
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: min-content auto;
+	grid-template-rows: repeat(auto-fill,12vh);
+	box-shadow: 0px 0px 25px -13px var(--dark-color);
+	opacity: .7;
+	transition: opacity 1s;
+	min-width: 25vh;
+}
+.card *:not(.counter){
+	grid-column-start: 2;
+	text-align: center;
+}
+.card:hover{
+	opacity: 1;
+}
+.counter{
+	/* border: solid .25rem var(--dark-color); */
+	grid-column-start: 1;
+	grid-row-start: 1;
+	margin: auto;
+	padding: 1rem;
+	aspect-ratio: 1/1;
+	text-align: center;
+	position: relative;
+	box-sizing: border-box;
+	z-index: 1;
+	display: grid;
+	line-height: 115%;
+}
+.counter::before{
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	z-index: -1;
+	background-color: var(--dark-color);
+	aspect-ratio: 1/1;
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+}
+.btn{
+	background-color: var(--light-color);
+	color: var(--dark);
+	text-decoration: none;
+	position: relative;
+	border-radius: 1em;
+	padding: .5rem .75rem;
+	min-height: 2em;
+	margin: auto;
+	border: solid 1px var(--dark);
+	overflow: hidden;
+	z-index: 1;
+	font-weight: bold;
+	transition: all 1s;
+}
+.btn::before{
+	z-index: -1;
+	background-color: var(--light-color);
+	content: "";
+	position: absolute;
+	display: block;
+	top:0;
+	left:0;
+	width: 101%;
+	height: 100%;
+	transform:translateX(-100%);
+	transition: all 1s;
+	border-radius: 2em;
+}
+.btn:hover{
+	color: var(--light-color);
+}
+.btn:hover::before{
+	border-radius: 5px;
+	background-color: var(--dark-color);
+	transform:translateX(0%);
+}
+p{
+	margin: 0;
+}
+@media (min-aspect-ratio: 12/9) {
+	.grid{
+		grid-template-columns: repeat(3,25vw);
+	}
+	.card{
+		width:25vw;
+	}
+}
+@media (max-aspect-ratio: 12/9) and (min-aspect-ratio: 1/1) {
+	.grid{
+		grid-template-columns: repeat(2,37.5vw);
+	}
+	.card{
+		width:100%;
+	}
+}
+@media (max-aspect-ratio: 1/1) {
+	.grid{
+		grid-template-rows: auto;
+		width: 50vw;
+	}
+}
+.dialog-focus{
+	user-select: none;
+}
+dialog{
+	position: fixed;
+	left:50%;
+	top:100%;
+	transform: translate(-100%,100%);
+	transition: all 1s;
+	display: block;
+	min-width: 25vw;
+	min-height: 25vh;
+	background-color: var(--light-color);
+	color: var(--dark);
+	border: solid var(--light) 1px;
+	border-radius:2rem;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	padding: 0;
+	overflow: hidden;
+	box-shadow: 0px 0px 25px -13px var(--dark-color);
+}
+dialog>*:not(:where(h,h1,h2,h3,h4,h5):first-child){
+	margin: .5rem 1.5rem;
+}
+dialog>*:where(h,h1,h2,h3,h4,h5):first-child ~ a{
+	--color:var(--light-color);
+}
+dialog>*:where(h,h1,h2,h3,h4,h5):first-child{
+	margin: 0%;
+	margin-bottom: 1rem;
+	padding: 1rem 1.5rem;
+	background-color: var(--dark-color);
+	color:var(--light-color);
+	width: 100%;
+	height: max-content;
+}
+dialog[open]{
+	top:50%;
+	transform: translate(-50%,-50%);
+	min-width: 50vw;
+	min-height: 50vh;
+	z-index: 50;
+}
+dialog a[href='#'] , dialog a.close{
+	position: absolute;
+	top: 0%;
+	right: 0%;
+	position: absolute;
+	width: 24px;
+	height: 24px;
+	border: 1px solid var(--color);
+	border-radius: 50%;
+	text-align: center;
+	font-weight: bold;
+	color: var(--color);
+	text-decoration: none;
+	cursor: pointer;
+}

@@ -1,0 +1,27 @@
+{
+	"Info Generales":{
+		"href":"infogestion",
+		"rights":["PDG"],
+		"button":"Suivre les Informations Generales",
+		"icon":"profite"
+	},
+	"Analyse":{
+		"href":"analyse",
+		"rights":["PDG"],
+		"button":"Lancer une Analyse",
+		"icon":"analyse"
+	},
+	"Demande":{
+		"href":"demande",
+		"rights":["CDS","PDG","CPT","EMP"],
+		"button":"Faire une demande",
+		"icon":"ask"
+	},
+	"Project":{
+		"href":"projects",
+		"rights":["CDS","PDG"],
+		"button":"Gerer les Project",
+		"value":"projects.length",
+		"icon":"project"
+	}
+}
