@@ -37,6 +37,7 @@ class BaseDAO extends EventTarget{
 		construct.push(`var object = ${JSON.stringify(object)}`)
 		Object.keys(object).forEach((x)=>{
 			agrs.push(x)
+			console.log(x)
 			columns.add(x)
 			construct.push(`object.${x} = ${x}`)
 			construct.push(`Object.defineProperty(self,"${x}",
@@ -59,9 +60,16 @@ class BaseDAO extends EventTarget{
 		// console.log(constructor.toString())
 		// constructor = Object.assign(BaseDAO,constructor)
 		constructor.prototype = new BaseDAO
+		// constructor.name = clazz.name
 		Object.defineProperty(constructor,"columns",{
-			get:()=>{return new Set(...columns)},
+			get:()=>{return new Set(columns)},
 		})
+		
+		var descriptor = Reflect.getOwnPropertyDescriptor(constructor,"name")
+		Reflect.deleteProperty(constructor,"name")
+		descriptor.value = clazz.name
+		Reflect.defineProperty(constructor,"name",descriptor)
+		
 		return constructor
 	}
 }

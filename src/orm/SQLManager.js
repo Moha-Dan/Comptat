@@ -1,4 +1,5 @@
-const Database = require('better-sqlite3')
+const Database = require('./drivers/sqlite');
+const BaseDAO = require('./BaseDAO');
 
 class SQLManager extends EventTarget{
 	#sql
@@ -16,36 +17,57 @@ class SQLManager extends EventTarget{
 	}
 	create(table,obj){
 		if(!obj){
-			obj = table
+			obj = [...table.columns]
 			table = table.name
+		}else{
+			obj = Object.keys(obj)
 		}
-		console.log(table)
-		var columns = Object.keys(obj).map(x=>`${x} = ?`)
+		console.log(table,obj)
+		var columns = obj.map(x=>`${x}`)
 		var sql = `CREATE TABLE ${table} (_index INTEGER${(columns.length?","+columns.join(","):"")})`
-		console.log(sql)
-		var stmt = this.#sql.prepare(sql);
-		stmt.run()
+		this.#sql.exec(sql);
 	}
 	insert(table,...objs){
-		var keys = Object.keys(objs[0]).map(x=>`@${x}`)
-		const insert = this.#sql.prepare(`INSERT INTO ${table} VALUES (${keys.join(",")})`);
-		this.#sql.transaction((objs) => {
-			for (const obj of objs) insert.run(obj);
-		});
+		var columns
+		if(typeof table != "string"){
+			columns = [...table.columns]
+			table = table.name
+		}else{
+			columns = Object.keys(objs[0])
+		}
+		console.log(table,columns)
+		var stmt = this.#sql.transaction((objs) => {
+			for (const obj of objs){
+				var keys = columns.map(x=>`'${obj[x]}'`)
+				var sql = `INSERT INTO ${table} VALUES (0,${keys.join(",")})`
+				this.#sql.prepare(sql);
+			}
+		})(objs);
+		console.log(stmt)
+		if(stmt){
+			this.#sql.exec(stmt)
+		}
 	}
-	select(table,obj,contraints = {}){
+	select(table,obj  = {},contraints = {}){
+		if(typeof table != "string"){
+			table = table.name
+		}
 		var {columns,limit,order,filter,distinct,offset,where,group} = contraints;
 		columns ??= "*"
 		where ??= ""
-		where = Object.keys(obj).map(x=>`${x} = ?`) + where
-		const stmt = this.#sql.prepare(`SELECT ${distinct?"DISTINCT":""} ${columns} FROM ${table} WHERE ${where} ${order?"ORDER BY"+order:""} ${limit?"LIMIT "+limit+(offset?"OFFSET"+offset:""):""} ${group?"GROUP BY "+group:""} ${filter?"HAVING "+filter:""}`);
-		if(!limit || limit > 1){
-			return stmt.all(Object.values(obj));
-		}else{
-			return stmt.get(Object.values(obj));
-		}
+		var wherefromO = Object.keys(obj).map((x,n)=>`${x} = '${obj[x]}'`)//${n!=0?"AND":""}
+		where = wherefromO.join(' AND ') + (where.length>3?" AND "+where:"")
+		console.log(table,wherefromO,Object.keys(obj),where)
+		const stmt = this.#sql.exec(`SELECT ${distinct?"DISTINCT":""} ${columns} FROM ${table}${where.length > 4?' WHERE '+where:""}${order?" ORDER BY"+order:""} ${limit?" LIMIT "+limit+(offset?" OFFSET"+offset:""):""} ${group?" GROUP BY "+group:""} ${filter?" HAVING "+filter:""}`);
+		console.log(stmt)
+		// if(!limit || limit > 1){
+		// 	return stmt.all(Object.values(obj));
+		// }else{
+		// 	return stmt.get(Object.values(obj));
+		// }
 	}
 	update(table,obj){
+		if(table instanceof BaseDAO)table = table.name
 		var updated = Object.keys(obj).map(x=>`${x} = ?`)
 		const update = this.#sql.prepare(`UPDATE ${table} SET ${updated} WHERE _index = ${obj._index}`);
 	}
