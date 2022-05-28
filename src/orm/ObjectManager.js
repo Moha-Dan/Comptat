@@ -1,4 +1,6 @@
-class Manager{
+const ListDAO = require("./ListDAO")
+
+class ObjectManager extends EventTarget{
 	#database
 	constructor(database){
 		this.#database = database
@@ -11,9 +13,9 @@ class Manager{
 		return this.#tables.get(name)
 	}
 	set(name,clazz){
-		var T = new Table(clazz,this.#database,name)
+		var T = new ListDAO(clazz,this.#database,name)
 		this.#tables.set(name,T)
 		return T
 	}
 }
-module.exports = {ObjectManager:Manager,ObjectTable:Table}
+module.exports = ObjectManager

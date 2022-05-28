@@ -1,0 +1,15 @@
+{
+	"demande":{
+		"yours":{
+			"query":"Demandes",
+			"where":{
+				"Demandes.demandeur":"@id"
+			}
+		},
+		"yoursCount":{
+			"columns":"count(*)",
+			"query":"demande.yours"
+		},
+		"projects":"<option>${Projects.name}</option>"
+	}
+}

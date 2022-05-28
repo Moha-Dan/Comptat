@@ -1,0 +1,27 @@
+{
+	"Project":{
+		"name":"TEXT",
+		"description":"TEXT",
+		"date":"TEXT",
+		"uuid":{
+			"type":"INT",
+			"primary":true
+		}
+	},
+	"Demande":{
+		"demandeur":{"ref":"User"},
+		"project":{"ref":"Project"},
+		"montant":"INT",
+		"reason":"TEXT"
+	},
+	"User":{
+		"username":"TEXT",
+		"password":"TEXT",
+		"roles":"INT",
+		"uuid":{
+			"type":"INT",
+			"primary":true
+		}
+
+	}
+}

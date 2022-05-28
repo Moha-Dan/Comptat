@@ -1,4 +1,4 @@
-const Annotation = require("../annotation/Annotation")
+const Annotation = require("../Reflect/Annotation")
 
 const NULL = Symbol.for("NULL")
 const INTEGER = Symbol.for("INTEGER")

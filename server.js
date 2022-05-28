@@ -1,10 +1,7 @@
 const port = 8047;
-const data = {
-
-}
 require("./src/servers/websocket")(
 	require("./src/servers/webserver")(),
-	data
+	require("./src/servers/sqlserver")
 )
 .listen(port);
 /*

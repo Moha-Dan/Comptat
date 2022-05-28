@@ -15,6 +15,7 @@
 		"href":"demande",
 		"rights":["CDS","PDG","CPT","EMP"],
 		"button":"Faire une demande",
+		"value":"demande.yoursCount",
 		"icon":"ask"
 	},
 	"Project":{
