@@ -11,5 +11,11 @@
 			"query":"demande.yours"
 		},
 		"projects":"<option>${Projects.name}</option>"
+	},
+	"project":{
+		"length":{
+			"columns":"count(*)",
+			"query":"Projects"
+		}
 	}
 }

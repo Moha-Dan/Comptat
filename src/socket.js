@@ -12,7 +12,8 @@ function onMessage(msg,ws){
 		return service[msg.service](msg,ws)
 	}else if(msg.wsv){
 		ws.wsv.add(msg.wsv)
-		msg = {wsv:msg.wsv,value:0}
+		var value = ws.query(msg.wsv,ws.data)
+		msg = {wsv:msg.wsv,value}
 		return msg
 	}else{
 		console.error('unkown object %s',msg)

@@ -22,6 +22,7 @@ function createCard(name,app){
 const service = {
 	connect(msg,ws){
 		ws.uuid = msg.uuid
+		ws.data.id = 0
 		if(ws.uuid != msg.uuid){
 			return {connected:true,service:"connect",rights,uuid}
 		}else{

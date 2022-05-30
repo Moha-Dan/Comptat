@@ -22,7 +22,7 @@
 		"href":"projects",
 		"rights":["CDS","PDG"],
 		"button":"Gerer les Project",
-		"value":"projects.length",
+		"value":"project.length",
 		"icon":"project"
 	}
 }

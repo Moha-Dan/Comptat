@@ -2,8 +2,10 @@ const clients = new Map()
 
 class Client{
 	#ws
-	constructor(ws){
+	#data
+	constructor(ws,data){
 		this.#ws = ws
+		this.#data = data
 	}
 	#uuid = null
 	set uuid(value){
@@ -27,6 +29,14 @@ class Client{
 		return this["#uuid"]
 	}
 	wsv = new Set()
+	query(qc,data){
+		try{
+			return this.#data.query(qc,data)
+		}catch{
+			return null
+		}
+	}
+	data = {}
 }
 
 module.exports = function(server,data){

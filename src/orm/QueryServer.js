@@ -5,12 +5,15 @@ const SQLManager = require("./SQLManager")
 class QueryServer{
 	#sqlm = null
 	#entities = null
+	get entities(){
+		return this.#entities
+	}
 	#queries = null
 	constructor(config){
 		this.#sqlm = new SQLManager(config.database)
 		const entities = Object.keys(config.entities||{})
 		this.#queries = (config.queries||{})
-		this.#entities = {}
+		this.#entities = new Map()
 		entities.forEach(x=>{
 			var table = this.createClassFromEntity(x,config.entities[x])
 			var tables = this.#sqlm.exec(`.schema ${table.name}`)
@@ -25,7 +28,7 @@ class QueryServer{
 				console.log("exec","create")
 				this.#sqlm.exec(create)
 			}
-			this.#entities[table.name] = table
+			this.#entities.set(table.name, table)
 		})
 	}
 	query(query,data){
@@ -41,7 +44,8 @@ class QueryServer{
 		var S = `SELECT ${columns||"*"} FROM ${tables} ${where.length>0?"WHERE "+where.join(' AND '):""}`
 		// console.log(S)
 		var R = this.#sqlm.exec(S)
-		console.log(R)
+		// console.log(R)
+		return R
 	}
 	queryBuild(query,data){
 		var queryFX = typeof query == "string"?query:query.query
@@ -53,7 +57,7 @@ class QueryServer{
 		if(!queryFX)return QD
 		queryFX = queryFX.split(".")
 		// console.log(this.#entities[queryFX[0]],queryFX[0])
-		if(this.#entities[queryFX[0]]){
+		if(this.#entities.has(queryFX[0])){
 			var table = queryFX[0]
 			if(!QD.tables.has(table)){
 				QD.tables.set(table,new Set)
@@ -62,8 +66,8 @@ class QueryServer{
 				QD.tables.get(table).add(queryFX[1])
 				QD.columns.add(`${table}.${queryFX[1]}`)
 			}else{
-				QD.tables.set(table,new Set(this.#entities[table].columns))
-				this.#entities[table].columns.forEach(x=>{
+				QD.tables.set(table,new Set(this.#entities.get(table).columns))
+				this.#entities.get(table).columns.forEach(x=>{
 					QD.columns.add(`${table}.${x}`)
 				})
 			}
@@ -93,6 +97,7 @@ class QueryServer{
 				})
 			}
 			if(typeof queryFX == "string"){
+				queryFX = `'${queryFX}'`
 				QD = [...queryFX.matchAll(/\$\{.+\}/g)].reduce((all,x)=>{
 					var y = x[0].slice(2,-1)
 					var qd = this.queryBuild(y,data)
@@ -109,9 +114,10 @@ class QueryServer{
 					qd.where.forEach((value,key)=>{
 						all.where.set(key,value)
 					})
-					queryFX = queryFX.replace(x[0],`,${z.join(',')},`)
+					queryFX = queryFX.replace(x[0],`',${z.join(',')},'`)
 					return all
 				},QD)
+				queryFX.replaceAll("''","")
 				// console.log(queryFX,QD)
 				QD.columns = new Set(queryFX.split(','))
 			}
@@ -120,7 +126,11 @@ class QueryServer{
 			// console.log(query)
 			if(query.columns){
 				QD.columns.clear()
-				QD.columns.add(query.columns)
+				if(typeof query.columns == "string")
+					query.columns = [query.columns]
+				query.columns.forEach(x=>{
+					QD.columns.add(x)
+				})
 			}
 			if(query.where){
 				Object.keys(query.where).forEach(x=>{
