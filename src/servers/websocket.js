@@ -47,7 +47,7 @@ module.exports = function(server,data){
 		ws.on('message', function message(_msg) {
 			console.log('received: %s', _msg);
 			var msg = JSON.parse(_msg)
-			var onMessage = require('../socket');
+			var onMessage = require('../sokects/socket');
 			var response = onMessage(msg,client)||{}
 			// console.info('unkown response %s',response)
 			response = JSON.stringify(response)

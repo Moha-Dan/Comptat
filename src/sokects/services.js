@@ -36,7 +36,7 @@ const service = {
 		}
 	},
 	dashboard(msg,ws){
-		var apps = require('./apps.json')
+		var apps = require('../../config/apps.json')
 		var menu = []
 		for(appName in apps){
 			var app = apps[appName]

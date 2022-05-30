@@ -4,8 +4,8 @@ module.exports = function(){
 	const qs = createQueryServer(
 		{
 			database:"database.db",
-			entities:require("../entities.json"),
-			queries:require("../queries.json"),
+			entities:require("../../config/entities.json"),
+			queries:require("../../config/queries.json"),
 		}
 	)
 	return qs
