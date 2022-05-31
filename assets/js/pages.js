@@ -17,6 +17,20 @@ const service = {
 		var menus = msg.menu
 		menu.innerHTML = menus.join('')
 		findWSV(menu)
+	},
+	sendForm(form){
+		var inputs = form.querySelectorAll('input:not([type=submit],[type=button]),textarea,select')
+		var values = {}
+		inputs.forEach(x=>{
+			var value = x.checked||x.value||x.selectedOptions||x.textContent
+			values[x.name] = value
+		})
+		console.log(values)
+		session.set("table",form.getAttribute('table'))
+		var origin = [...document.querySelectorAll("[data-title]")].find(x=>[...x.querySelectorAll("a[href]")].find(x=>x.href==location.href)).dataset.title 
+		session.set("origin",origin)
+		session.set("form",values)
+		session.save()
 	}
 }
 function move(page){
@@ -68,6 +82,6 @@ session.addEventListener('message',(ev)=>{
 	}else if(message.wsv){
 		WSVs.get(message.wsv).innerHTML = message.value
 	}else{
-		console.error('unkown object %s',msg)
+		console.error('unkown object %s',JSON.stringify(message))
 	}
 })

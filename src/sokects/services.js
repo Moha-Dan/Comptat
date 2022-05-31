@@ -1,4 +1,6 @@
 const { randomUUID } = require('crypto');
+var apps = require('../../config/apps.json');
+
 function createCard(name,app){
 	var badge = ""
 	if(app.value){
@@ -6,13 +8,13 @@ function createCard(name,app){
 	}
 	var btn = ""
 	if(app.href){
-		btn = `<a class="btn" onclick="location.assign('#${app.href}')" />${app.button}</a>`
+		btn = `<a class="btn" href="#${app.href}" />${app.button}</a>`
 	}
 	var description = ""
 	if(app.description){
 		description = `<p>${app.description}</p>`
 	}
-	return `<div class="card">
+	return `<div class="card" data-title="${name}" >
 	<h2>${name}</h2>
 	${badge}
 	${description}
@@ -36,7 +38,6 @@ const service = {
 		}
 	},
 	dashboard(msg,ws){
-		var apps = require('../../config/apps.json')
 		var menu = []
 		for(appName in apps){
 			var app = apps[appName]
@@ -46,6 +47,22 @@ const service = {
 			menu.push(_file)
 		}
 		return {service:"dashboard",menu}
+	},
+	insert(msg,ws){
+		var d = msg.form
+		var p = msg.origin.charAt(0).toUpperCase()+msg.origin.slice(1)
+		var t = msg.table
+
+		var success = false
+
+		if(apps[p] && apps[p].rights && apps[p].rights.includes(ws.rights)){
+			success = ws.insert(t,d,ws.rights)
+			console.log("step1 true")
+		}
+
+		var msg = {success}
+		console.log(msg)
+		return msg
 	}
 }
 module.exports = service

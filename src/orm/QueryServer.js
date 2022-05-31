@@ -1,10 +1,12 @@
 const { columns } = require("./BaseDAO")
 const BaseDAO = require("./BaseDAO")
+const ListDAO = require("./ListDAO")
 const SQLManager = require("./SQLManager")
 
 class QueryServer{
 	#sqlm = null
 	#entities = null
+	#tables = null
 	get entities(){
 		return this.#entities
 	}
@@ -14,6 +16,7 @@ class QueryServer{
 		const entities = Object.keys(config.entities||{})
 		this.#queries = (config.queries||{})
 		this.#entities = new Map()
+		this.#tables = new Map()
 		entities.forEach(x=>{
 			var table = this.createClassFromEntity(x,config.entities[x])
 			var tables = this.#sqlm.exec(`.schema ${table.name}`)
@@ -28,6 +31,7 @@ class QueryServer{
 				console.log("exec","create")
 				this.#sqlm.exec(create)
 			}
+			this.#tables.set(table.name, new ListDAO(table))
 			this.#entities.set(table.name, table)
 		})
 	}
@@ -145,6 +149,7 @@ class QueryServer{
 	createClassFromEntity(name,entity){
 		var table = {}
 		Object.keys(entity).forEach(name=>{
+			if(name.startsWith("__"))return
 			var x = entity[name]
 			if(typeof x == "object"){
 				var {type,primary,notnull} = x
@@ -154,7 +159,22 @@ class QueryServer{
 			var attribut = `${type} ${primary?"PRIMARY KEY ":""}${notnull?"NOT NULL ":""}`
 			table[name] = attribut
 		})
-		return BaseDAO.fromClass(table,name+"s")
+		var clazz = BaseDAO.fromClass(table,name+"s")
+		// clazz.prototype.roles = entity.__roles
+		clazz.roles = entity.__roles
+		return clazz
+	}
+	insert(tableName,obj){
+		var table = this.#tables.get(tableName)
+		if(!table)return false
+		console.log("step4 true")
+		var entity = this.#entities.get(tableName)
+		console.log("step5 true",entity,this.#entities.keys(),tableName)
+		if(!entity)return false
+		var args = [...entity.columns].map(x=>{return obj[x]||null})
+		var inst = new entity(...args)
+		table.push(inst)
+		return true
 	}
 }
 

@@ -12,7 +12,7 @@ class Client{
 		console.log(clients.has(value))
 		if(clients.has(value)){
 			var attrs = clients.get(value)
-			for(attr in attrs){
+			for(var attr in attrs){
 				if(attr.startsWith('#'))continue
 				if(attr == "uuid"){
 					this["#uuid"] = attrs[attr]
@@ -35,6 +35,16 @@ class Client{
 		}catch{
 			return null
 		}
+	}
+	insert(table,obj,role=null){
+		if(!this.#data.entities.has(table))return false
+		var t = this.#data.entities.get(table)
+		console.log(t.roles)
+		if(t.roles && t.roles.includes(role)){
+			console.log("step2 true")
+			return this.#data.insert(table,obj)
+		}
+		return false
 	}
 	data = {}
 }

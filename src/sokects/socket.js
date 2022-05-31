@@ -15,6 +15,8 @@ function onMessage(msg,ws){
 		var value = ws.query(msg.wsv,ws.data)
 		msg = {wsv:msg.wsv,value}
 		return msg
+	}else if(msg.form){
+		return service.insert(msg,ws)
 	}else{
 		console.error('unkown object %s',msg)
 		return {}

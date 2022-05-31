@@ -1,7 +1,7 @@
 <dialog id="demande" >
 	<h1>Faire une Demande</h1>
 	<a class="close" onclick="dialog.close()">X</a>
-	<haiku-form>
+	<haiku-form onsubmit="alert('send')">
 		<fieldset>
 			<h2>Raison</h2>
 			<div class="input-group">
@@ -22,7 +22,7 @@
 				<label>Montant : </label>
 				<input type="number" />
 			</div>
-			<input type="button" class="next action-button" value="Next" name="next"/>
+			<input type="button" class="submit action-button" value="Send" name="submit" />
 		</fieldset>
 	</haiku-form>
 </dialog>

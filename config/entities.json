@@ -6,13 +6,22 @@
 		"uuid":{
 			"type":"INT",
 			"primary":true
-		}
+		},
+		"__roles":["CDS","PDG"]
 	},
 	"Demande":{
 		"demandeur":{"ref":"User"},
 		"project":{"ref":"Project"},
 		"montant":"INT",
 		"reason":"TEXT"
+	},
+	"Compte":{
+		"nom":"TEXT"
+	},
+	"Transaction":{
+		"montant":"INT",
+		"source":{"ref":"Compte"},
+		"destination":{"ref":"Compte"}
 	},
 	"User":{
 		"username":"TEXT",
