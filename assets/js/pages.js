@@ -76,7 +76,15 @@ session.addEventListener('message',(ev)=>{
 		var parent = document.querySelector(message.selector||"body")
 		parent.appendChild(div)
 		findWSV(parent)
-		Haiku.update()
+		if(globalThis.Haiku){
+			Haiku.update()
+		}else{
+			var target = document.querySelector(location.hash)
+			if(target){
+				target.open = true
+				globalThis.dialog = target
+			}
+		}
 	}else if(message.service){
 		service[message.service](message)
 	}else if(message.wsv){

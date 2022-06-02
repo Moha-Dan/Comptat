@@ -4,8 +4,7 @@
 		"description":"TEXT",
 		"date":"TEXT",
 		"uuid":{
-			"type":"INT",
-			"primary":true
+			"type":"INT"
 		},
 		"__roles":["CDS","PDG"]
 	},

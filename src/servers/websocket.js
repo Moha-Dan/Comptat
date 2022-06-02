@@ -46,16 +46,28 @@ class Client{
 		}
 		return false
 	}
+	remakeQuery(...queries){
+		queries.forEach(query=>{
+			if(this.wsv.has(query)){
+				var value = this.query(query,this.data)
+				var msg = {wsv:query,value}
+				this.#ws.send(JSON.stringify(msg))
+				console.log(query)
+			}
+		})
+	}
 	data = {}
 }
 
 module.exports = function(server,data){
 	const ws = require('ws');
 	const wss = new ws.WebSocketServer({ server });
+	const clients = new Set()
 	wss.on('connection', function connection(ws) {
 		var client = new Client(ws,data)
+		clients.add(client)
 		ws.on('message', function message(_msg) {
-			console.log('received: %s', _msg);
+			// console.log('received: %s', _msg);
 			var msg = JSON.parse(_msg)
 			var onMessage = require('../sokects/socket');
 			var response = onMessage(msg,client)||{}
@@ -63,6 +75,16 @@ module.exports = function(server,data){
 			response = JSON.stringify(response)
 			ws.send(response);
 		});
+		ws.on("close",()=>{
+			clients.delete(client)
+		})
+		data.manager.addEventListener('insert',(e)=>{
+			var t = e.table
+			var q = data.queriesUsed.get(t)
+			if(q){
+				clients.forEach(c=>c.remakeQuery(...q))
+			}
+		})
 	});
 	return server
 }

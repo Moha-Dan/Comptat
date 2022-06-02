@@ -5,6 +5,9 @@ const SQLManager = require("./SQLManager")
 
 class QueryServer{
 	#sqlm = null
+	get manager(){
+		return this.#sqlm
+	}
 	#entities = null
 	#tables = null
 	get entities(){
@@ -35,6 +38,10 @@ class QueryServer{
 			this.#entities.set(table.name, table)
 		})
 	}
+	#queryUsed = new Map()
+	get queriesUsed(){
+		return this.#queryUsed
+	}
 	query(query,data){
 		var Q = this.queryBuild(query,data)
 		// console.log(Q)
@@ -46,9 +53,14 @@ class QueryServer{
 		})
 		// console.log(where)
 		var S = `SELECT ${columns||"*"} FROM ${tables} ${where.length>0?"WHERE "+where.join(' AND '):""}`
-		// console.log(S)
+		console.log(S)
+		tables.forEach(x=>{
+			if(!this.#queryUsed.has(x))
+				this.#queryUsed.set(x,new Set())
+			this.#queryUsed.get(x).add(query)
+		})
 		var R = this.#sqlm.exec(S)
-		// console.log(R)
+		console.log(R)
 		return R
 	}
 	queryBuild(query,data){
@@ -167,13 +179,14 @@ class QueryServer{
 	insert(tableName,obj){
 		var table = this.#tables.get(tableName)
 		if(!table)return false
-		console.log("step4 true")
+		// console.log("step4 true")
 		var entity = this.#entities.get(tableName)
-		console.log("step5 true",entity,this.#entities.keys(),tableName)
+		// console.log("step5 true",entity,this.#entities.keys(),tableName)
 		if(!entity)return false
 		var args = [...entity.columns].map(x=>{return obj[x]||null})
 		var inst = new entity(...args)
-		table.push(inst)
+		// table.push(inst)
+		this.#sqlm.insert(entity,inst)
 		return true
 	}
 }

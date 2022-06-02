@@ -28,7 +28,7 @@ class SQLManager extends EventTarget{
 		}
 		// console.log(table,obj)
 		var columns = obj.map(x=>`${x.name||x} ${x.data?x.data:""}`)
-		var sql = `CREATE TABLE ${table} (_index INTEGER${(columns.length?","+columns.join(","):"")});`
+		var sql = `CREATE TABLE ${table} (_index INTEGER AUTO_INCREMENT${(columns.length?","+columns.join(","):"")});`
 		return sql
 	}
 	create(table,obj){
@@ -47,7 +47,7 @@ class SQLManager extends EventTarget{
 		var stmt = this.#sql.transaction((objs) => {
 			for (const obj of objs){
 				var keys = columns.map(x=>`'${obj[x]}'`)
-				var sql = `INSERT INTO ${table} VALUES (0,${keys.join(",")})`
+				var sql = `INSERT INTO ${table} (${columns.join(",")}) VALUES (${keys.join(",")})`
 				this.#sql.prepare(sql);
 			}
 		})(objs);
@@ -55,6 +55,9 @@ class SQLManager extends EventTarget{
 		if(stmt){
 			this.#sql.exec(stmt)
 		}
+		var e = new Event('insert')
+		e.table = table
+		this.dispatchEvent(e)
 	}
 	select(table,obj = {},contraints = {}){
 		if(typeof table != "string"){
