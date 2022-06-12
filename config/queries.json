@@ -1,21 +1,54 @@
 {
 	"demande":{
 		"yours":{
-			"query":"Demandes",
+			"query":"Demands",
 			"where":{
-				"Demandes.demandeur":"@id"
+				"Demands.author":"@id"
 			}
 		},
 		"yoursCount":{
 			"columns":"count(*)",
 			"query":"demande.yours"
 		},
-		"projects":"<option>${Projects.name}</option>"
+		"length":{
+			"columns":"count(*)",
+			"where":"validated = null",
+			"query":"Demands"
+		},
+		"current":{
+			"columns":"*",
+			"where":"validated = null",
+			"query":"Demands"
+		},
+		"projects":"<option value=\"${Projects.uuid}\" >${Projects.name}</option>"
 	},
 	"project":{
 		"length":{
 			"columns":"count(*)",
 			"query":"Projects"
+		}
+	},
+	"info":{
+		"benefit":{
+			"columns":"sum(amount) as benefit",
+			"query":"Transactions"
+		},
+		"CA_type":{
+			"columns":"TransactionReasons.type as type,sum(amount) as benefit",
+			"group":"TransactionReason.type",
+			"query":"Transactions",
+			"join":["TransactionReasons"],
+			"where":"amount>0"
+		},
+		"regime":{
+			"columns":"case when sum(amount)<170000 and type = 0 or type = 2 then 'micro' else 'reel simplfier' end ",
+			"query":"info.CA_type"
+		},
+		"FFOM":{
+			"columns":"Projects.name,sum(account),case when sum(account)>1 then 'gain' else 'deficite' end ",
+			"query":"Demands",
+			"join":["Projects"],
+			"group":"Projects.uuid"
 		}
 	}
 }

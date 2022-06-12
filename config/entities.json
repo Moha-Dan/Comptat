@@ -2,34 +2,57 @@
 	"Project":{
 		"name":"TEXT",
 		"description":"TEXT",
-		"date":"TEXT",
+		"date":"DATE",
 		"uuid":{
-			"type":"INT"
+			"type":"UUID"
 		},
 		"__roles":["CDS","PDG"]
 	},
-	"Demande":{
-		"demandeur":{"ref":"User"},
-		"project":{"ref":"Project"},
-		"montant":"INT",
-		"reason":"TEXT"
+	"Demand":{
+		"author":{"ref":"User"},
+		"project":{"ref":"Project","by":"uuid"},
+		"account":"INT",
+		"reason":"TEXT",
+		"validated":"INT",
+		"__roles":["CDS","PDG","EMP"]
 	},
-	"Compte":{
-		"nom":"TEXT"
+	"TransactionReason":{
+		"date":"DATE",
+		"label":"TEXT",
+		"notes":"TEXT",
+		"type":"INT",
+		"reference":"TEXT",
+		"validated":"INT",
+		"related":"INT",
+		"origin":{"ref":"Demand"}
 	},
 	"Transaction":{
-		"montant":"INT",
+		"amount":"FLOAT",
+		"reason":{"ref":"TransactionReason"},
 		"source":{"ref":"Compte"},
 		"destination":{"ref":"Compte"}
+	},
+	"Compte":{
+		"date":"DATE",
+		"user":{"ref":"User"}
+	},
+	"Departement":{
+		"label":"TEXT",
+		"director":{"ref":"Employee"}
 	},
 	"User":{
 		"username":"TEXT",
 		"password":"TEXT",
+		"date":"DATE",
 		"roles":"INT",
 		"uuid":{
-			"type":"INT",
+			"type":"UUID",
 			"primary":true
 		}
-
+	},
+	"Employee":{
+		"user":{"ref":"User"},
+		"departement":{"ref":"Departement"},
+		"superior":{"ref":"Employee"}
 	}
 }

@@ -50,6 +50,7 @@ const service = {
 	},
 	insert(msg,ws){
 		var d = msg.form
+		d.author ??= ws.data.id
 		var p = msg.origin.charAt(0).toUpperCase()+msg.origin.slice(1)
 		var t = msg.table
 

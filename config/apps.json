@@ -24,5 +24,12 @@
 		"button":"Gerer les Project",
 		"value":"project.length",
 		"icon":"project"
+	},
+	"Validation Demand":{
+		"href":"validdemand",
+		"rights":["CMP","PDG"],
+		"button":"Gerer les Demandes",
+		"value":"demande.length",
+		"icon":"ask"
 	}
 }

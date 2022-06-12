@@ -1,7 +1,6 @@
 const BaseDAO = require("./BaseDAO")
 
 class ListDAO extends EventTarget{
-	#array = []
 	#database
 	#source
 	#name
@@ -41,6 +40,10 @@ class ListDAO extends EventTarget{
 		var res = this.#database.select(this.#source,obj,{limit:1})
 		return this.#rebuild(res)[0].value
 	}
+	indexOf(obj){
+		var res = this.#database.select(this.#source,obj,{limit:1,columns:["_index"]})
+		return this.#rebuild(res)[0].value
+	}
 	forEach(callback){
 		var res = this.#database.select(this.#source,null)
 		this.#rebuild(res).forEach(x=>{
@@ -48,12 +51,14 @@ class ListDAO extends EventTarget{
 		})
 	}
 	push(...items){
-		this.#array.push(...items)
+		items.forEach(item=>{
+			this.#database.insert(this.#source,item)
+		})
 		var ev = new Event("push")
 		ev.table = this.#name
 		ev.prop = {
 			name:"length",
-			value:this.#array.length,
+			value:items.length,
 		}
 		this.dispatchEvent(ev)
 	}

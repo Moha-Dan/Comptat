@@ -2,6 +2,7 @@ const { columns } = require("./BaseDAO")
 const BaseDAO = require("./BaseDAO")
 const ListDAO = require("./ListDAO")
 const SQLManager = require("./SQLManager")
+const { randomUUID } = require('crypto');
 
 class QueryServer{
 	#sqlm = null
@@ -9,6 +10,7 @@ class QueryServer{
 		return this.#sqlm
 	}
 	#entities = null
+	#Sentities = null
 	#tables = null
 	get entities(){
 		return this.#entities
@@ -20,6 +22,7 @@ class QueryServer{
 		this.#queries = (config.queries||{})
 		this.#entities = new Map()
 		this.#tables = new Map()
+		this.#Sentities = config.entities
 		entities.forEach(x=>{
 			var table = this.createClassFromEntity(x,config.entities[x])
 			var tables = this.#sqlm.exec(`.schema ${table.name}`)
@@ -34,7 +37,7 @@ class QueryServer{
 				console.log("exec","create")
 				this.#sqlm.exec(create)
 			}
-			this.#tables.set(table.name, new ListDAO(table))
+			this.#tables.set(table.name, new ListDAO(table,this.#sqlm))
 			this.#entities.set(table.name, table)
 		})
 	}
@@ -45,15 +48,17 @@ class QueryServer{
 	query(query,data){
 		var Q = this.queryBuild(query,data)
 		// console.log(Q)
-		var {columns,tables,where} = Q
+		var {columns,tables,where,strWhere} = Q
 		columns = columns?[...columns].join(','):"*"
 		tables = [...tables.keys()]
 		var where = [...where.keys()].map(x=>{
 			return `${x} = ${Q.where.get(x)}`
 		})
 		// console.log(where)
-		var S = `SELECT ${columns||"*"} FROM ${tables} ${where.length>0?"WHERE "+where.join(' AND '):""}`
-		console.log(S)
+		var S = `SELECT ${columns||"*"} FROM ${tables} ${where.length>0?"WHERE "+where.join(' AND ')+strWhere.join(' AND '):""}`
+		if(Q.group.length)
+			S+=`GROUP BY ${Q.group.join(',')}`
+		// console.log(S)
 		tables.forEach(x=>{
 			if(!this.#queryUsed.has(x))
 				this.#queryUsed.set(x,new Set())
@@ -61,19 +66,24 @@ class QueryServer{
 		})
 		var R = this.#sqlm.exec(S)
 		console.log(R)
+		if(typeof R == "string")
+			return R.split(',')
 		return R
 	}
 	queryBuild(query,data){
 		var queryFX = typeof query == "string"?query:query.query
 		var QD = {
+			strWhere:new Array(),
 			where:new Map(),
 			tables:new Map(),
 			columns:new Set(),
+			group:new Array(),
 		}
 		if(!queryFX)return QD
 		queryFX = queryFX.split(".")
 		// console.log(this.#entities[queryFX[0]],queryFX[0])
 		if(this.#entities.has(queryFX[0])){
+			//exist tables
 			var table = queryFX[0]
 			if(!QD.tables.has(table)){
 				QD.tables.set(table,new Set)
@@ -89,6 +99,7 @@ class QueryServer{
 			}
 
 		}else{
+			//sub query
 			queryFX = queryFX.reduce((p,o)=>{
 				if(p == null){
 					return this.#queries[o] || this.#entities[o]
@@ -98,6 +109,7 @@ class QueryServer{
 			},null)
 			if(typeof queryFX == "object"){
 				var qd = this.queryBuild(queryFX,data)
+				console.log(queryFX)
 				// console.log(queryFX,qd)
 				qd.tables.forEach((value,key)=>{
 					if(!QD.tables.has(key)){
@@ -114,7 +126,8 @@ class QueryServer{
 			}
 			if(typeof queryFX == "string"){
 				queryFX = `'${queryFX}'`
-				QD = [...queryFX.matchAll(/\$\{.+\}/g)].reduce((all,x)=>{
+				// console.log(queryFX)
+				QD = [...queryFX.matchAll(/\$\{[^\}]+\}/g)].reduce((all,x)=>{
 					var y = x[0].slice(2,-1)
 					var qd = this.queryBuild(y,data)
 					var z = []
@@ -140,8 +153,45 @@ class QueryServer{
 		}
 		if(typeof query =="object"){
 			// console.log(query)
+			if(query.join){
+				QD.complex = true
+				QD.inners = new Array()
+				var tables = [...QD.tables.keys()]
+				query.join.forEach(queryStr=>{
+					var qd = this.queryBuild(queryStr,data)
+					qd.where.forEach((value,key)=>{
+						QD.where.set(key,value)
+					})
+					tables.forEach(x=>{
+						var ent = this.#Sentities[x.slice(0,-1)]
+						Object.keys(ent).forEach(z=>{
+							var y = ent[z]
+							if(typeof y != "object")return
+							var key = y.ref+"s"
+							if(qd.tables.has(key)
+							&&
+							!QD.tables.has(key)
+							){
+								var value = qd.tables.get(key)
+								QD.where.set(`${x}.${z}`,`${key}._index`)
+								if(!QD.tables.has(key)){
+									QD.tables.set(key,new Set)
+								}
+								QD.tables.get(key).add(value)
+								value.forEach(x=>{
+									QD.columns.add(`${key}.${x}`)
+								})
+							}
+						})
+					})
+				})
+			}
+			if(query.group){
+				QD.group.push(query.group)
+			}
 			if(query.columns){
-				QD.columns.clear()
+				// if(!query.columns)
+					QD.columns.clear()
 				if(typeof query.columns == "string")
 					query.columns = [query.columns]
 				query.columns.forEach(x=>{
@@ -149,10 +199,14 @@ class QueryServer{
 				})
 			}
 			if(query.where){
-				Object.keys(query.where).forEach(x=>{
-					var attr = query.where[x].slice(1)
-					QD.where.set(x,data[attr])
-				})
+				if(typeof query.where == "string"){
+					QD.strWhere.push(query.where)
+				}else{
+					Object.keys(query.where).forEach(x=>{
+						var attr = query.where[x].slice(1)
+						QD.where.set(x,data[attr])
+					})
+				}
 			}
 		}
 		// console.log(QD)
@@ -183,10 +237,25 @@ class QueryServer{
 		var entity = this.#entities.get(tableName)
 		// console.log("step5 true",entity,this.#entities.keys(),tableName)
 		if(!entity)return false
+
+		var ent = this.#Sentities[tableName.slice(0,-1)]
+		Object.keys(ent).forEach(z=>{
+			var y = ent[z]
+			if(y.ref){
+				var ref = this.#tables.get(y.ref+"s")
+				obj[z] = ref.indexOf({[y.by||"_index"]:obj[z]})
+			}else{
+				switch(y.type){
+					case "DATE": obj[z]??= Date.now()
+					case "UUID": obj[z]??= randomUUID()
+				}
+			}
+
+		})
 		var args = [...entity.columns].map(x=>{return obj[x]||null})
 		var inst = new entity(...args)
-		// table.push(inst)
-		this.#sqlm.insert(entity,inst)
+		table.push(inst)
+		// this.#sqlm.insert(entity,inst)
 		return true
 	}
 }

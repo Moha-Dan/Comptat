@@ -1,28 +1,23 @@
 <dialog id="demande" >
 	<h1>Faire une Demande</h1>
 	<a class="close" onclick="dialog.close()">X</a>
-	<haiku-form onsubmit="alert('send')" table="Demandes">
-		<fieldset>
+	<div class="table" data-wsvalue="Demands" >Loading ...</div>
+	<form onsubmit="service.sendForm(this);return false;" table="Demands">
 			<h2>Raison</h2>
 			<div class="input-group">
 				<label>Project : </label>
-				<select data-wsvalue="demande.projects" >
+				<select name="project" data-wsvalue="demande.projects" >
 				</select>
 			</div>
 			<div class="input-group">
 				<label>Expliquer votre demande et sa raison : </label>
-				<textarea></textarea>
+				<textarea name="reason"></textarea>
 			</div>
-			
-			<input type="button" class="next action-button" value="Next" name="next"/>
-		</fieldset>
-		<fieldset>
 			<h2>Demande</h2>
 			<div class="input-group">
 				<label>Montant : </label>
-				<input type="number" />
+				<input name="account" type="number" />
 			</div>
-			<input type="button" class="submit action-button" value="Send" name="submit" />
-		</fieldset>
-	</haiku-form>
+			<input type="submit" class="submit action-button" value="Send" name="submit" />
+	</form>
 </dialog>
