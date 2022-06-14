@@ -21,20 +21,29 @@ function createCard(name,app){
 	${btn}
 	</div>`
 }
+var config = require('../../config/config.json')
 const service = {
 	connect(msg,ws){
-		ws.uuid = msg.uuid
-		ws.data.id = 0
-		if(ws.uuid != msg.uuid){
-			return {connected:true,service:"connect",rights,uuid}
-		}else{
-			ws.client = msg
-			ws.client.connected = true;
-			var rights = "PDG"
-			ws.rights = rights
-			var uuid = randomUUID()
-			ws.uuid = uuid
-			return {connected:true,service:"connect",rights,uuid}
+		var user = {username:msg.username,password:msg.password}
+		var users = ws.getTable('Users')
+		var reslt = users.find(user)
+		if(reslt){
+			ws.uuid = msg.uuid
+			ws.data.id = 0
+			if(ws.uuid != msg.uuid){
+				return {connected:true,service:"connect",rights,uuid}
+			}else{
+				ws.client = msg
+				ws.client.connected = true;
+				var rights = "PDG"
+				ws.rights = rights
+				var uuid = randomUUID()
+				ws.uuid = uuid
+				return {connected:true,service:"connect",rights,uuid}
+			}
+		}else if(config.admin.username == user.username && config.admin.password == user.password){
+			console.log("admin")
+			return {connected:true,service:"connect",rights:"ADM",uuid}
 		}
 	},
 	dashboard(msg,ws){
@@ -64,6 +73,14 @@ const service = {
 		var msg = {success}
 		console.log(msg)
 		return msg
-	}
+	},
+	// adminconnect(msg,ws){
+	// 	var users = ws.getTable('Users')
+	// 	var reslt = users.find({username:msg.username,password:msg.password})
+	// 	if(!reslt){
+	// 		users.push()
+	// 		return this.connect(msg,ws)
+	// 	}
+	// }
 }
 module.exports = service

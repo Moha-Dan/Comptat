@@ -12,6 +12,9 @@ class QueryServer{
 	#entities = null
 	#Sentities = null
 	#tables = null
+	get tables(){
+		return this.#tables
+	}
 	get entities(){
 		return this.#entities
 	}

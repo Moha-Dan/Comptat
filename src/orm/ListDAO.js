@@ -38,7 +38,7 @@ class ListDAO extends EventTarget{
 	}
 	find(obj){
 		var res = this.#database.select(this.#source,obj,{limit:1})
-		return this.#rebuild(res)[0].value
+		return this.#rebuild(res)[0]?.value
 	}
 	indexOf(obj){
 		var res = this.#database.select(this.#source,obj,{limit:1,columns:["_index"]})

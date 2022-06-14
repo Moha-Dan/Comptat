@@ -1,14 +1,14 @@
 <dialog id="login">
 		<h1>Account Login</h1>
 		<div >
-			<input type="text" name="username">
+			<input type="text" name="username" onchange="globalThis.username = this">
 			<label >Username</label>
 		</div>
 		<div class="">
-			<input type="password" name="password">
+			<input type="password" name="password" onchange="globalThis.password = this">
 			<label>Password</label>
 		</div>
-		<button onclick='session.set("service","connect"),session.set("username","PDG"),session.set("password","PDG"),session.save();location.hash = "";dialog.close()' >
+		<button onclick='session.set("service","connect"),session.set("username",username.value),session.set("password",password.value),session.save();location.hash = "";dialog.close()' >
 			Sign in
 		</button>
 		<div>

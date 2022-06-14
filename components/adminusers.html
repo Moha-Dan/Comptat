@@ -1,0 +1,24 @@
+<dialog id="projects">
+	<h1>Les Utilisateurs</h1>
+	<a class="close" onclick="dialog.close()">X</a>
+	<div class="table" data-wsvalue="Users" >Loading ...</div>
+	<form onsubmit="service.sendForm(this);return false;" table="Users">
+		<div >
+			<input type="text" name="username" onchange="globalThis.username = this">
+			<label >Username</label>
+		</div>
+		<div class="">
+			<input type="password" name="password" onchange="globalThis.password = this">
+			<label>Password</label>
+		</div>
+		<div class="">
+			<input type="password" name="password" onchange="globalThis.password = this">
+			<label>Password</label>
+		</div>
+		<div class="">
+			<input type="number" name="roles" onchange="globalThis.roles = this">
+			<label>Password</label>
+		</div>
+		<input type="submit">
+	</form>
+</dialog>

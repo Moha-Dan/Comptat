@@ -56,11 +56,22 @@ class Client{
 			}
 		})
 	}
+	getTable(name){
+		return this.#data.tables.get(name)
+	}
 	data = {}
 }
 
 module.exports = function(server,data){
 	const ws = require('ws');
+	const config = require('../../config/config.json');
+	// noUser = true
+	// if(config.init.createUser && 
+	// 	data.query(config.init.createUser.query) 
+	// 	!= config.init.createUser.result
+	// ){
+	// 	noUser = false
+	// }
 	const wss = new ws.WebSocketServer({ server });
 	const clients = new Set()
 	wss.on('connection', function connection(ws) {

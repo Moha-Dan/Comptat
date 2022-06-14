@@ -31,5 +31,17 @@
 		"button":"Gerer les Demandes",
 		"value":"demande.length",
 		"icon":"ask"
+	},
+	"Database":{
+		"href":"admindatabase",
+		"rights":["ADM","PDG"],
+		"button":"Voir la Base",
+		"icon":"db"
+	},
+	"User":{
+		"href":"adminusers",
+		"rights":["ADM","PDG"],
+		"button":"Gerer les utilisateurs",
+		"icon":"user"
 	}
 }

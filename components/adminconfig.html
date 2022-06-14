@@ -1,0 +1,19 @@
+<dialog id="login">
+	<h1>First Login</h1>
+	<div >
+		<input type="text" name="username" onchange="globalThis.username = this">
+		<label >Username</label>
+	</div>
+	<div class="">
+		<input type="password" name="password" onchange="globalThis.password = this">
+		<label>Password</label>
+	</div>
+	<button onclick='session.set("service","adminconnect"),session.set("username",username.value),session.set("password",password.value),session.save();location.hash = "";dialog.close()' >
+		Sign in
+	</button>
+	<div>
+		<a href="https://www.famobuty.fr/espace_membre/recovery" class="txt1">
+			Mot de passe oublier ?
+		</a>
+	</div>
+</dialog>

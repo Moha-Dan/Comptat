@@ -28,6 +28,19 @@
 			"query":"Projects"
 		}
 	},
+	"users":{
+		"roles":{
+			"columns":"",
+			"where":{
+				"Users.uuid":"@id"
+			},
+			"query":"Users"
+		},
+		"length":{
+			"columns":"count(*)",
+			"query":"Users"
+		}
+	},
 	"info":{
 		"benefit":{
 			"columns":"sum(amount) as benefit",

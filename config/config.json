@@ -1,0 +1,13 @@
+{
+	"admin":{
+		"username":"root",
+		"password":"123"
+	},
+	"init":{
+		"createUser":{
+			"query" : "users.length",
+			"result":0,
+			"page":"adminusers"
+		}
+	}
+}
